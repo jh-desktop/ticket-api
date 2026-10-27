@@ -27,6 +27,27 @@ class InvalidTransitionError(AppError):
     code = "invalid_transition"
 
 
+class ConflictError(AppError):
+    """이미 존재하는 것을 또 만들려 할 때 (예: 같은 이메일로 가입)."""
+
+    status_code = 409
+    code = "conflict"
+
+
+class UnauthorizedError(AppError):
+    """누구인지 모름 — 토큰이 없거나, 틀리거나, 만료됨."""
+
+    status_code = 401
+    code = "unauthorized"
+
+
+class ForbiddenError(AppError):
+    """누구인지는 알지만 이 일을 할 권한이 없음."""
+
+    status_code = 403
+    code = "forbidden"
+
+
 def register_exception_handlers(app: FastAPI) -> None:
     """AppError 계열이 라우터 밖으로 튀어나오면 통일된 JSON 으로 응답한다."""
 

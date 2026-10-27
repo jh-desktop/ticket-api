@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     mongo_uri: str = "mongodb://localhost:27017"
     mongo_db_name: str = "ticket_api"
     jwt_secret: str
+    jwt_expire_minutes: int = 60
+    cookie_secure: bool = False  # 운영(HTTPS)에서는 .env 로 True
 
 
 @lru_cache
