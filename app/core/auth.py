@@ -55,7 +55,7 @@ def clear_auth_cookie(response: Response) -> None:
     response.delete_cookie(key=COOKIE_NAME, path="/")
 
 
-def _extract_token(request: Request) -> str | None:
+def extract_token(request: Request) -> str | None:
     """쿠키 우선, 없으면 Authorization: Bearer 헤더 (CronJob·스크립트 등 브라우저가 아닌 호출용)."""
     token = request.cookies.get(COOKIE_NAME)
     if token:
@@ -75,7 +75,7 @@ async def get_current_user(
 
     토큰이 없거나 틀리면 UnauthorizedError(401) 가 나서 라우터 본문은 실행되지 않는다.
     """
-    token = _extract_token(request)
+    token = extract_token(request)
     if token is None:
         raise UnauthorizedError("Not authenticated")
     payload = decode_access_token(token, settings)

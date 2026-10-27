@@ -48,12 +48,17 @@ class ForbiddenError(AppError):
     code = "forbidden"
 
 
+def error_response(exc: AppError) -> JSONResponse:
+    """AppError → 통일된 JSON 응답. 핸들러와 미들웨어가 같은 모양을 쓰도록 한 곳에 둔다."""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error": {"code": exc.code, "message": exc.message}},
+    )
+
+
 def register_exception_handlers(app: FastAPI) -> None:
     """AppError 계열이 라우터 밖으로 튀어나오면 통일된 JSON 으로 응답한다."""
 
     @app.exception_handler(AppError)
     async def _handle_app_error(_: Request, exc: AppError) -> JSONResponse:
-        return JSONResponse(
-            status_code=exc.status_code,
-            content={"error": {"code": exc.code, "message": exc.message}},
-        )
+        return error_response(exc)
