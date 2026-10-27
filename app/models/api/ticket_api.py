@@ -2,6 +2,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
+from app.models.db.tickets import TicketStatus
+
 
 class TicketCreate(BaseModel):
     """POST /tickets 요청 본문. 프론트가 티켓을 만들 때 보내는 데이터."""
@@ -23,5 +25,5 @@ class TicketResponse(BaseModel):
     id: str
     title: str
     description: str | None
-    status: str
+    status: TicketStatus
     created_at: datetime

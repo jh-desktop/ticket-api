@@ -8,6 +8,7 @@ from pymongo.asynchronous.database import AsyncDatabase
 from app.api.v1.ticket_router import router as ticket_router
 from app.core.config import Settings, get_settings
 from app.core.db import close_db, connect_db, get_db
+from app.core.exceptions import register_exception_handlers
 from app.repositories.ticket_repo import TicketRepository
 
 
@@ -23,6 +24,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(title="ticket-api", lifespan=lifespan)
 
+register_exception_handlers(app)
 app.include_router(ticket_router)
 
 

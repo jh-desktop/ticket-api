@@ -8,7 +8,7 @@ FastAPI + Pydantic v2 + MongoDB(pymongo AsyncMongoClient) 백엔드 학습 프�
 | 주차 | 주제 | 상태 |
 | --- | --- | --- |
 | 1 | FastAPI + Pydantic + Depends → 인메모리 티켓 CRUD | ✅ [정리](docs/week1.md) |
-| 2 | MongoDB + 리포지토리 레이어 | ⬜ |
+| 2 | MongoDB + 리포지토리 레이어 | ✅ [정리](docs/week2.md) |
 | 3 | 서비스 레이어 + 에러 처리 + 감사 로그 | ⬜ |
 | 4 | JWT 인증 + RBAC | ⬜ |
 | 5 | 테스트 + 타입체크 + 시드 | ⬜ |

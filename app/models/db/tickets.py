@@ -1,11 +1,14 @@
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
 
 # Mongo 의 ObjectId 를 str 로 받아들이는 타입.
 # BeforeValidator(str): 검증 전에 str() 을 한 번 거친다 → ObjectId("...") 가 "..." 문자열이 된다.
 ObjectIdStr = Annotated[str, BeforeValidator(str)]
+
+# 티켓이 가질 수 있는 상태. 이 셋 외의 값은 Pydantic 이 거부한다.
+TicketStatus = Literal["open", "approved", "rejected"]
 
 
 class TicketDoc(BaseModel):
@@ -17,6 +20,6 @@ class TicketDoc(BaseModel):
     id: ObjectIdStr = Field(alias="_id")
     title: str
     description: str | None = None
-    status: str = "open"
+    status: TicketStatus = "open"
     created_at: datetime
     updated_at: datetime
