@@ -8,6 +8,7 @@ from pymongo.asynchronous.database import AsyncDatabase
 from app.api.v1.audit_router import router as audit_router
 from app.api.v1.auth_router import router as auth_router
 from app.api.v1.ticket_router import router as ticket_router
+from app.api.v1.user_router import router as user_router
 from app.core.config import Settings, get_settings
 from app.core.db import close_db, connect_db, get_db
 from app.core.exceptions import register_exception_handlers
@@ -34,6 +35,7 @@ register_exception_handlers(app)
 app.include_router(auth_router)
 app.include_router(ticket_router)
 app.include_router(audit_router)
+app.include_router(user_router)
 
 
 @app.get("/health")

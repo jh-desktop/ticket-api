@@ -14,6 +14,7 @@ class TicketRepository:
     """tickets 컬렉션에 대한 모든 Mongo 쿼리는 여기에만 둔다.
 
     라우터/서비스는 Mongo 문법을 몰라도 되게, 파이썬 메서드로 감싼다.
+    권한은 모른다 — 서비스가 넘겨주는 scope 필터를 그대로 쿼리에 섞을 뿐이다.
     """
 
     def __init__(self, db: AsyncDatabase) -> None:
@@ -23,9 +24,13 @@ class TicketRepository:
         """서버 시작 시 1회. 이미 있으면 아무 일도 안 한다."""
         await self._col.create_index([("status", ASCENDING)])
         await self._col.create_index([("created_at", ASCENDING)])
+        await self._col.create_index([("group_id", ASCENDING)])  # 그룹 스코핑 조회용
+        await self._col.create_index([("owner_id", ASCENDING)])  # OWNER 조회용
 
-    async def list(self, *, skip: int = 0, limit: int = 20) -> list[TicketDoc]:
-        cursor = self._col.find().sort("created_at", ASCENDING).skip(skip).limit(limit)
+    async def list(
+        self, scope: dict[str, Any], *, skip: int = 0, limit: int = 20
+    ) -> list[TicketDoc]:
+        cursor = self._col.find(scope).sort("created_at", ASCENDING).skip(skip).limit(limit)
         return [TicketDoc.model_validate(doc) async for doc in cursor]
 
     async def get(self, ticket_id: ObjectId) -> TicketDoc | None:
@@ -52,5 +57,5 @@ class TicketRepository:
 
 
 def get_ticket_repo(db: Annotated[AsyncDatabase, Depends(get_db)]) -> TicketRepository:
-    """의존성 체인: get_db → get_ticket_repo → 라우터."""
+    """의존성 체인: get_db → get_ticket_repo → 서비스."""
     return TicketRepository(db)

@@ -21,5 +21,7 @@ class TicketDoc(BaseModel):
     title: str
     description: str | None = None
     status: TicketStatus = "open"
+    owner_id: str  # 만든 사용자 (users._id 문자열)
+    group_id: str  # 소속 프로젝트 그룹. 권한 스코핑의 기준
     created_at: datetime
     updated_at: datetime

@@ -18,8 +18,10 @@ class AuthService:
     async def signup(self, *, email: str, password: str) -> UserDoc:
         if await self._users.get_by_email(email) is not None:
             raise ConflictError("Email already registered")
+        # 부트스트랩: 아직 아무도 없으면 첫 가입자가 ADMIN. 그 뒤로는 ADMIN 이 /users 로 역할을 부여한다.
+        role = "ADMIN" if await self._users.count() == 0 else "OWNER"
         return await self._users.create(
-            {"email": email, "password_hash": hash_password(password), "role": "OWNER", "groups": []}
+            {"email": email, "password_hash": hash_password(password), "role": role, "groups": []}
         )
 
     async def login(self, *, email: str, password: str) -> tuple[UserDoc, str]:
