@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 
@@ -16,9 +18,10 @@ class TicketUpdate(BaseModel):
 
 
 class TicketResponse(BaseModel):
-    """서버가 돌려주는 티켓 한 건의 모양."""
+    """서버가 돌려주는 티켓 한 건의 모양. DB 모델(TicketDoc)에서 내보낼 것만 고른다."""
 
-    id: int
+    id: str
     title: str
     description: str | None
     status: str
+    created_at: datetime
