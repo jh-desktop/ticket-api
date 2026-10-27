@@ -1,0 +1,15 @@
+# 로컬 개발용 MongoDB.
+#   띄우기: docker compose up -d
+#   끄기  : docker compose down        (데이터는 남음)
+#   초기화: docker compose down -v     (데이터까지 삭제)
+services:
+  mongo:
+    image: mongo:7
+    container_name: ticket-api-mongo
+    ports:
+      - "27017:27017"          # 내 PC 27017 → 컨테이너 27017
+    volumes:
+      - mongo_data:/data/db    # 컨테이너를 지워도 데이터 유지
+
+volumes:
+  mongo_data:
