@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -15,7 +16,7 @@ class Settings(BaseSettings):
     app_env: str = "dev"
     mongo_uri: str = "mongodb://localhost:27017"
     mongo_db_name: str = "ticket_api"
-    jwt_secret: str
+    jwt_secret: str = Field(min_length=32)  # HS256 은 32바이트 이상 권장 (RFC 7518). 짧으면 시작 자체를 막는다
     jwt_expire_minutes: int = 60
     cookie_secure: bool = False  # 운영(HTTPS)에서는 .env 로 True
 

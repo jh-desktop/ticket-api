@@ -1,18 +1,17 @@
-from datetime import UTC, datetime
 from typing import Annotated, Any
 
 from fastapi import Depends
 from pymongo import ASCENDING, DESCENDING
-from pymongo.asynchronous.database import AsyncDatabase
 
-from app.core.db import get_db
+from app.core.clock import utcnow
+from app.core.db import MongoDB, get_db
 from app.models.db.audit_logs import AuditLogDoc
 
 
 class AuditRepository:
     """audit_logs 컬렉션. 추가(insert)와 조회(find)만 있고 수정·삭제는 없다 — 감사 로그는 고치지 않는다."""
 
-    def __init__(self, db: AsyncDatabase) -> None:
+    def __init__(self, db: MongoDB) -> None:
         self._col = db["audit_logs"]
 
     async def ensure_indexes(self) -> None:
@@ -20,7 +19,7 @@ class AuditRepository:
         await self._col.create_index([("ticket_id", ASCENDING), ("created_at", DESCENDING)])
 
     async def insert(self, data: dict[str, Any]) -> AuditLogDoc:
-        doc = {**data, "created_at": datetime.now(UTC)}
+        doc = {**data, "created_at": utcnow()}
         result = await self._col.insert_one(doc)
         return AuditLogDoc.model_validate({**doc, "_id": result.inserted_id})
 
@@ -38,5 +37,5 @@ class AuditRepository:
         return [AuditLogDoc.model_validate(doc) async for doc in cursor]
 
 
-def get_audit_repo(db: Annotated[AsyncDatabase, Depends(get_db)]) -> AuditRepository:
+def get_audit_repo(db: Annotated[MongoDB, Depends(get_db)]) -> AuditRepository:
     return AuditRepository(db)

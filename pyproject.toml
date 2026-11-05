@@ -22,5 +22,23 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "basedpyright>=1.40.2",
     "httpx>=0.28.1",
+    "pytest>=9.2.0",
+    "pytest-asyncio>=1.4.1.post1",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"                       # async def 테스트에 데코레이터 없이도 실행
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    "ignore:Using `httpx` with `starlette.testclient`",   # httpx2 권장 경고 (5주차 미해결)
+]
+
+[tool.basedpyright]
+pythonVersion = "3.11"
+typeCheckingMode = "strict"     # 회사와 동일. TS 의 strict 와 비슷한 체감
+include = ["app", "tests"]
+venvPath = "."
+venv = ".venv"

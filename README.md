@@ -11,7 +11,7 @@ FastAPI + Pydantic v2 + MongoDB(pymongo AsyncMongoClient) 백엔드 학습 프�
 | 2 | MongoDB + 리포지토리 레이어 | ✅ [정리](docs/week2.md) |
 | 3 | 서비스 레이어 + 에러 처리 + 감사 로그 | ✅ [정리](docs/week3.md) |
 | 4 | JWT 인증 + RBAC | ✅ [정리](docs/week4.md) |
-| 5 | 테스트 + 타입체크 + 시드 | ⬜ |
+| 5 | 테스트 + 타입체크 + 시드 | ✅ [정리](docs/week5.md) |
 | 6 | 스케줄러 + Docker + K8s | ⬜ |
 
 ## 실행
@@ -20,6 +20,12 @@ FastAPI + Pydantic v2 + MongoDB(pymongo AsyncMongoClient) 백엔드 학습 프�
 uv sync                                   # 의존성 설치 (.venv 생성)
 cp .env.example .env                      # 환경변수 파일 준비
 uv run uvicorn app.server:app --reload    # http://localhost:8000/docs
+```
+
+```bash
+uv run python -m app.scripts.seed         # 샘플 사용자·티켓 (비밀번호 password123)
+uv run pytest                             # 테스트 (별도 DB ticket_api_test 사용)
+uv run basedpyright                       # 타입 검사 (strict)
 ```
 
 ## 학습 방식

@@ -24,13 +24,14 @@ def create_access_token(user: UserDoc, settings: Settings) -> str:
         "iat": now,  # issued at
         "exp": now + timedelta(minutes=settings.jwt_expire_minutes),  # expiration
     }
-    return jwt.encode(payload, settings.jwt_secret, algorithm=_ALGORITHM)
+    # PyJWT 의 encode/decode 는 일부 인자 타입이 느슨해서 strict 모드에서 "partially unknown" 으로 잡힌다. 라이브러리 문제라 여기서만 무시.
+    return jwt.encode(payload, settings.jwt_secret, algorithm=_ALGORITHM)  # pyright: ignore[reportUnknownMemberType]
 
 
 def decode_access_token(token: str, settings: Settings) -> dict[str, Any]:
     """서명과 만료를 검증하고 payload 를 돌려준다. 실패하면 UnauthorizedError."""
     try:
-        return jwt.decode(token, settings.jwt_secret, algorithms=[_ALGORITHM])
+        return jwt.decode(token, settings.jwt_secret, algorithms=[_ALGORITHM])  # pyright: ignore[reportUnknownMemberType]
     except jwt.ExpiredSignatureError:
         raise UnauthorizedError("Token expired") from None
     except jwt.InvalidTokenError:

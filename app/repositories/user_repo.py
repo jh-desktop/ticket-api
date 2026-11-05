@@ -2,20 +2,19 @@
 # 아래 import 는 타입 힌트를 문자열로 미뤄 두어 그 충돌을 피한다.
 from __future__ import annotations
 
-from datetime import UTC, datetime
 from typing import Annotated, Any
 
 from bson import ObjectId
 from fastapi import Depends
 from pymongo import ASCENDING
-from pymongo.asynchronous.database import AsyncDatabase
 
-from app.core.db import get_db
+from app.core.clock import utcnow
+from app.core.db import MongoDB, get_db
 from app.models.db.users import UserDoc
 
 
 class UserRepository:
-    def __init__(self, db: AsyncDatabase) -> None:
+    def __init__(self, db: MongoDB) -> None:
         self._col = db["users"]
 
     async def ensure_indexes(self) -> None:
@@ -38,7 +37,7 @@ class UserRepository:
         return UserDoc.model_validate(doc) if doc else None
 
     async def create(self, data: dict[str, Any]) -> UserDoc:
-        doc = {**data, "created_at": datetime.now(UTC)}
+        doc = {**data, "created_at": utcnow()}
         result = await self._col.insert_one(doc)
         return UserDoc.model_validate({**doc, "_id": result.inserted_id})
 
@@ -49,5 +48,5 @@ class UserRepository:
         return UserDoc.model_validate(doc) if doc else None
 
 
-def get_user_repo(db: Annotated[AsyncDatabase, Depends(get_db)]) -> UserRepository:
+def get_user_repo(db: Annotated[MongoDB, Depends(get_db)]) -> UserRepository:
     return UserRepository(db)

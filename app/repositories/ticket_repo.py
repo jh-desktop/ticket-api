@@ -1,12 +1,11 @@
-from datetime import UTC, datetime
 from typing import Annotated, Any
 
 from bson import ObjectId
 from fastapi import Depends
 from pymongo import ASCENDING
-from pymongo.asynchronous.database import AsyncDatabase
 
-from app.core.db import get_db
+from app.core.clock import utcnow
+from app.core.db import MongoDB, get_db
 from app.models.db.tickets import TicketDoc
 
 
@@ -17,7 +16,7 @@ class TicketRepository:
     권한은 모른다 — 서비스가 넘겨주는 scope 필터를 그대로 쿼리에 섞을 뿐이다.
     """
 
-    def __init__(self, db: AsyncDatabase) -> None:
+    def __init__(self, db: MongoDB) -> None:
         self._col = db["tickets"]
 
     async def ensure_indexes(self) -> None:
@@ -38,7 +37,7 @@ class TicketRepository:
         return TicketDoc.model_validate(doc) if doc else None
 
     async def create(self, data: dict[str, Any]) -> TicketDoc:
-        now = datetime.now(UTC)
+        now = utcnow()
         doc = {**data, "status": "open", "created_at": now, "updated_at": now}
         result = await self._col.insert_one(doc)
         return TicketDoc.model_validate({**doc, "_id": result.inserted_id})
@@ -46,7 +45,7 @@ class TicketRepository:
     async def update(self, ticket_id: ObjectId, changes: dict[str, Any]) -> TicketDoc | None:
         doc = await self._col.find_one_and_update(
             {"_id": ticket_id},
-            {"$set": {**changes, "updated_at": datetime.now(UTC)}},
+            {"$set": {**changes, "updated_at": utcnow()}},
             return_document=True,  # 바뀐 후의 문서를 돌려받는다
         )
         return TicketDoc.model_validate(doc) if doc else None
@@ -56,6 +55,6 @@ class TicketRepository:
         return result.deleted_count == 1
 
 
-def get_ticket_repo(db: Annotated[AsyncDatabase, Depends(get_db)]) -> TicketRepository:
+def get_ticket_repo(db: Annotated[MongoDB, Depends(get_db)]) -> TicketRepository:
     """의존성 체인: get_db → get_ticket_repo → 서비스."""
     return TicketRepository(db)

@@ -1,9 +1,8 @@
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, Request, Response
-from pymongo.asynchronous.database import AsyncDatabase
 
 from app.api.v1.audit_router import router as audit_router
 from app.api.v1.auth_router import router as auth_router
@@ -11,7 +10,7 @@ from app.api.v1.ticket_router import router as ticket_router
 from app.api.v1.user_router import router as user_router
 from app.core.auth import decode_access_token, extract_token
 from app.core.config import Settings, get_settings
-from app.core.db import close_db, connect_db, get_db
+from app.core.db import MongoDB, close_db, connect_db, get_db
 from app.core.exceptions import AppError, UnauthorizedError, error_response, register_exception_handlers
 from app.repositories.audit_repo import AuditRepository
 from app.repositories.ticket_repo import TicketRepository
@@ -34,7 +33,7 @@ _NO_AUTH_PREFIXES: tuple[str, ...] = ("/scheduler/",)
 
 
 @asynccontextmanager
-async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+async def lifespan(_: FastAPI) -> AsyncGenerator[None]:
     # yield 전: 서버 시작 직후 실행
     await connect_db()
     await TicketRepository(get_db()).ensure_indexes()
@@ -82,7 +81,7 @@ app.include_router(user_router)
 @app.get("/health")
 async def health(
     settings: Annotated[Settings, Depends(get_settings)],
-    db: Annotated[AsyncDatabase, Depends(get_db)],
+    db: Annotated[MongoDB, Depends(get_db)],
 ) -> dict[str, str]:
     await db.command("ping")
     return {"status": "ok", "env": settings.app_env, "db": db.name}
