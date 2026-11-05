@@ -5,9 +5,11 @@ from pymongo import DESCENDING
 
 from app.core.clock import utcnow
 from app.core.db import MongoDB, get_db
+from app.core.trace import traced
 from app.models.db.snapshots import SnapshotDoc
 
 
+@traced("repository")
 class SnapshotRepository:
     """snapshots 컬렉션. 감사 로그처럼 추가·조회만 있다 — 과거 통계는 고치지 않는다."""
 

@@ -14,3 +14,7 @@ wheels/
 
 # Test / type-check caches
 .pytest_cache/
+
+# Frontend
+web/node_modules/
+web/dist/

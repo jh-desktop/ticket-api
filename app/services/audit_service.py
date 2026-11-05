@@ -2,10 +2,12 @@ from typing import Annotated, Any
 
 from fastapi import Depends
 
+from app.core.trace import traced
 from app.models.db.audit_logs import AuditAction, AuditLogDoc
 from app.repositories.audit_repo import AuditRepository, get_audit_repo
 
 
+@traced("service")
 class AuditService:
     """감사 로그를 남기고 조회한다. 다른 서비스(티켓 등)가 '기록해 줘' 하고 부른다."""
 

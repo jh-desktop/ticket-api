@@ -6,10 +6,12 @@ from app.core.auth import create_access_token
 from app.core.config import Settings, get_settings
 from app.core.exceptions import ConflictError, UnauthorizedError
 from app.core.security import hash_password, verify_password
+from app.core.trace import traced
 from app.models.db.users import UserDoc
 from app.repositories.user_repo import UserRepository, get_user_repo
 
 
+@traced("service")
 class AuthService:
     def __init__(self, users: UserRepository, settings: Settings) -> None:
         self._users = users

@@ -10,9 +10,11 @@ from pymongo import ASCENDING
 
 from app.core.clock import utcnow
 from app.core.db import MongoDB, get_db
+from app.core.trace import traced
 from app.models.db.users import UserDoc
 
 
+@traced("repository")
 class UserRepository:
     def __init__(self, db: MongoDB) -> None:
         self._col = db["users"]

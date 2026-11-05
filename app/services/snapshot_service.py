@@ -2,11 +2,13 @@ from typing import Annotated
 
 from fastapi import Depends
 
+from app.core.trace import traced
 from app.models.db.snapshots import SnapshotDoc
 from app.repositories.snapshot_repo import SnapshotRepository, get_snapshot_repo
 from app.repositories.ticket_repo import TicketRepository, get_ticket_repo
 
 
+@traced("service")
 class SnapshotService:
     """티켓 통계를 한 장 찍어 저장한다. 스케줄러(CronJob)가 주기적으로 부른다."""
 

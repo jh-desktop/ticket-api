@@ -28,6 +28,24 @@ uv run pytest                             # 테스트 (별도 DB ticket_api_test
 uv run basedpyright                       # 타입 검사 (strict)
 ```
 
+## 학습 UI (web/)
+
+초보자용 화면. 실제 기능(로그인·티켓·승인·감사 로그·스냅샷)을 눌러 보면 오른쪽 패널이
+**그 요청이 서버의 어느 레이어를 지났는지**(미들웨어 → 라우터 → 인증 → 서비스 → 리포지토리 → Mongo)를 그려 준다.
+용어집·학습 노트는 `docs/` 를 그대로 보여준다.
+
+```bash
+# 터미널 1 — 백엔드 (APP_ENV=dev 여야 X-Trace 헤더와 /learn/* 가 켜진다)
+docker compose up -d mongo
+uv run python -m app.scripts.seed            # 처음 한 번: 계정 5개 (비밀번호 password123)
+uv run uvicorn app.server:app --reload
+
+# 터미널 2 — 프론트
+cd web && npm install && npm run dev          # http://localhost:5173
+```
+
+Vite 가 `/api/*` 를 8000 으로 프록시하므로 쿠키가 같은 출처로 동작한다 (CORS 불필요). 도메인이 다른 운영 환경은 `CORS_ORIGINS` 설정.
+
 ## 컨테이너 / K8s
 
 ```bash

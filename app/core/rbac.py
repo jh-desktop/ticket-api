@@ -14,6 +14,7 @@
 from collections.abc import Callable, Coroutine
 from typing import Any
 
+from app.core import trace
 from app.core.auth import CurrentUser
 from app.core.exceptions import ForbiddenError
 from app.models.db.tickets import TicketDoc
@@ -24,6 +25,7 @@ from app.models.db.users import Role, UserDoc
 
 def scope_filter(user: UserDoc) -> dict[str, Any]:
     """이 사용자가 볼 수 있는 티켓만 남기는 Mongo 필터. 인가 결과가 '허용/거부' 가 아니라 '쿼리 조건' 으로 나타난다."""
+    trace.mark(f"rbac:scope_filter for {user.role}")
     if user.role == "ADMIN":
         return {}
     if user.role in ("GROUP_WRITER", "GROUP_READER"):
@@ -65,7 +67,9 @@ def can_transition(user: UserDoc, ticket: TicketDoc) -> bool:
 def ensure(allowed: bool, message: str) -> None:
     """서비스에서 `ensure(can_edit(user, ticket), "...")` 처럼 한 줄로 쓰기 위한 도우미."""
     if not allowed:
+        trace.mark("rbac:check DENIED → 403")
         raise ForbiddenError(message)
+    trace.mark("rbac:check ok")
 
 
 # ---- 3. 라우터용 의존성 --------------------------------------------------------
@@ -79,7 +83,9 @@ def require_role(*roles: Role) -> Callable[..., Coroutine[Any, Any, UserDoc]]:
 
     async def _dependency(user: CurrentUser) -> UserDoc:
         if user.role not in roles:
+            trace.mark(f"rbac:require_role({'|'.join(roles)}) DENIED for {user.role} → 403")
             raise ForbiddenError(f"Requires one of roles: {', '.join(roles)}")
+        trace.mark(f"rbac:require_role({'|'.join(roles)}) ok")
         return user
 
     return _dependency

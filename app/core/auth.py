@@ -5,6 +5,7 @@ import jwt
 from bson import ObjectId
 from fastapi import Depends, Request, Response
 
+from app.core import trace
 from app.core.config import Settings, get_settings
 from app.core.exceptions import UnauthorizedError
 from app.models.db.users import UserDoc
@@ -76,6 +77,7 @@ async def get_current_user(
 
     토큰이 없거나 틀리면 UnauthorizedError(401) 가 나서 라우터 본문은 실행되지 않는다.
     """
+    trace.mark("auth:get_current_user")
     token = extract_token(request)
     if token is None:
         raise UnauthorizedError("Not authenticated")

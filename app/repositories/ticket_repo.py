@@ -6,9 +6,11 @@ from pymongo import ASCENDING
 
 from app.core.clock import utcnow
 from app.core.db import MongoDB, get_db
+from app.core.trace import traced
 from app.models.db.tickets import TicketDoc
 
 
+@traced("repository")
 class TicketRepository:
     """tickets 컬렉션에 대한 모든 Mongo 쿼리는 여기에만 둔다.
 

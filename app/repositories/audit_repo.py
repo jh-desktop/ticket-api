@@ -5,9 +5,11 @@ from pymongo import ASCENDING, DESCENDING
 
 from app.core.clock import utcnow
 from app.core.db import MongoDB, get_db
+from app.core.trace import traced
 from app.models.db.audit_logs import AuditLogDoc
 
 
+@traced("repository")
 class AuditRepository:
     """audit_logs 컬렉션. 추가(insert)와 조회(find)만 있고 수정·삭제는 없다 — 감사 로그는 고치지 않는다."""
 

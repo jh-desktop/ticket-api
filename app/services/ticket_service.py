@@ -5,6 +5,7 @@ from fastapi import Depends
 
 from app.core import rbac
 from app.core.exceptions import InvalidTransitionError, NotFoundError
+from app.core.trace import traced
 from app.models.db.audit_logs import AuditAction
 from app.models.db.tickets import TicketDoc, TicketStatus
 from app.models.db.users import UserDoc
@@ -26,6 +27,7 @@ def _snapshot(ticket: TicketDoc) -> dict[str, Any]:
     return ticket.model_dump(include=_AUDITED_FIELDS)
 
 
+@traced("service")
 class TicketService:
     """티켓에 관한 비즈니스 규칙. HTTP 도 Mongo 도 모른다.
 

@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     jwt_secret: str = Field(min_length=32)  # HS256 은 32바이트 이상 권장 (RFC 7518). 짧으면 시작 자체를 막는다
     jwt_expire_minutes: int = 60
     cookie_secure: bool = False  # 운영(HTTPS)에서는 .env 로 True
+    # 학습 UI(Vite dev server) 가 쿠키를 주고받을 수 있게 허용할 출처. 운영은 실제 프론트 도메인으로.
+    cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
 
 
 @lru_cache

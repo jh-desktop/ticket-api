@@ -6,10 +6,12 @@ from bson import ObjectId
 from fastapi import Depends
 
 from app.core.exceptions import NotFoundError
+from app.core.trace import traced
 from app.models.db.users import Role, UserDoc
 from app.repositories.user_repo import UserRepository, get_user_repo
 
 
+@traced("service")
 class UserService:
     """사용자 관리 (ADMIN 용). 인증(가입/로그인)은 AuthService 가 따로 맡는다."""
 
