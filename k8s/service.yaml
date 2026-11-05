@@ -1,0 +1,12 @@
+# 앱 Pod 들 앞의 고정 주소. 레플리카가 2 개든 10 개든 "ticket-api" 하나로 부른다 (요청을 분산).
+# ClusterIP: 클러스터 안에서만 접근 가능. /scheduler/* 가 무인증이어도 밖에서는 못 부르는 이유.
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticket-api
+spec:
+  type: ClusterIP
+  selector: { app: ticket-api }
+  ports:
+    - port: 80            # 클러스터 안에서 부르는 포트:  http://ticket-api/
+      targetPort: 8000    # 컨테이너 포트

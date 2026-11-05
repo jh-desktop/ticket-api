@@ -1,0 +1,12 @@
+# 비밀이 아닌 설정. 앱 컨테이너에 환경변수로 주입된다 (deployment.yaml 의 envFrom).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ticket-api-config
+data:
+  APP_ENV: "dev"
+  # 클러스터 안에서는 Service 이름이 DNS 이름이다: mongo.yaml 의 Service "mongo"
+  MONGO_URI: "mongodb://mongo:27017"
+  MONGO_DB_NAME: "ticket_api"
+  COOKIE_SECURE: "false"
+  JWT_EXPIRE_MINUTES: "60"

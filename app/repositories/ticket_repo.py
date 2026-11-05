@@ -54,6 +54,19 @@ class TicketRepository:
         result = await self._col.delete_one({"_id": ticket_id})
         return result.deleted_count == 1
 
+    async def count_by(self, field: str) -> dict[str, int]:
+        """필드 값별 개수. 예: count_by("status") → {"open": 3, "approved": 2}
+
+        aggregation pipeline: 문서를 단계(stage)별로 흘려보내며 가공하는 Mongo 의 집계 기능.
+        $group 은 SQL 의 GROUP BY. "_id" 에 묶을 기준을, 나머지에 집계식($sum 등)을 적는다.
+        """
+        pipeline = [{"$group": {"_id": f"${field}", "count": {"$sum": 1}}}]
+        cursor = await self._col.aggregate(pipeline)
+        return {str(row["_id"]): int(row["count"]) async for row in cursor}
+
+    async def count(self) -> int:
+        return await self._col.count_documents({})
+
 
 def get_ticket_repo(db: Annotated[MongoDB, Depends(get_db)]) -> TicketRepository:
     """의존성 체인: get_db → get_ticket_repo → 서비스."""

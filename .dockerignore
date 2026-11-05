@@ -1,0 +1,14 @@
+# 이미지에 넣지 않을 것. 작을수록 빌드가 빠르고 비밀이 새지 않는다.
+.git
+.venv
+.env
+.env.*
+!.env.example
+__pycache__
+*.pyc
+.pytest_cache
+tests
+docs
+k8s
+web
+README.md

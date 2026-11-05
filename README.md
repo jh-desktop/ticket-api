@@ -12,7 +12,7 @@ FastAPI + Pydantic v2 + MongoDB(pymongo AsyncMongoClient) 백엔드 학습 프�
 | 3 | 서비스 레이어 + 에러 처리 + 감사 로그 | ✅ [정리](docs/week3.md) |
 | 4 | JWT 인증 + RBAC | ✅ [정리](docs/week4.md) |
 | 5 | 테스트 + 타입체크 + 시드 | ✅ [정리](docs/week5.md) |
-| 6 | 스케줄러 + Docker + K8s | ⬜ |
+| 6 | 스케줄러 + Docker + K8s | ✅ [정리](docs/week6.md) |
 
 ## 실행
 
@@ -27,6 +27,18 @@ uv run python -m app.scripts.seed         # 샘플 사용자·티켓 (비밀번�
 uv run pytest                             # 테스트 (별도 DB ticket_api_test 사용)
 uv run basedpyright                       # 타입 검사 (strict)
 ```
+
+## 컨테이너 / K8s
+
+```bash
+docker compose up -d --build              # 앱 + Mongo 컨테이너 (http://localhost:8000)
+kind create cluster --name ticket-api     # 로컬 K8s
+kind load docker-image ticket-api:local --name ticket-api
+kubectl apply -f k8s/                     # 레플리카 2개 + Mongo + 5분 CronJob
+kubectl create job --from=cronjob/ticket-snapshots snap-now   # 스냅샷 즉시 생성
+```
+
+자세한 명령은 [docs/week6.md](docs/week6.md).
 
 ## 학습 방식
 

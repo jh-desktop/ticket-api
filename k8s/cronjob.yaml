@@ -1,0 +1,25 @@
+# 외부 스케줄러. 5 분마다 작은 컨테이너(curl)를 하나 띄워 앱의 /scheduler/snapshots 를 한 번 호출한다.
+# 앱 레플리카가 몇 개든 호출은 1 번 → Service 가 그중 하나에 전달 → 스냅샷 1 건.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ticket-snapshots
+spec:
+  schedule: "*/5 * * * *"          # 분 시 일 월 요일. 학습 중엔 "*/1 * * * *" 로 바꿔 1 분마다 보면 편하다
+  concurrencyPolicy: Forbid        # 이전 실행이 안 끝났으면 겹쳐 띄우지 않는다
+  successfulJobsHistoryLimit: 3    # 완료된 Job 은 3 개만 남긴다 (kubectl get jobs 로 확인용)
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2              # 실패하면 2 번까지 재시도
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: curl
+              image: curlimages/curl:8.10.1
+              args:
+                - -fsS                # 실패(4xx/5xx)면 종료코드 ≠ 0 → Job 실패로 기록
+                - -X
+                - POST
+                - http://ticket-api/scheduler/snapshots   # Service 이름으로 호출

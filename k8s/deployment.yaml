@@ -1,0 +1,35 @@
+# 앱 배포. "이 이미지를 N 개 띄우고, 죽으면 다시 띄우고, 이 환경변수를 줘라."
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticket-api
+  labels: { app: ticket-api }
+spec:
+  replicas: 2                      # ← 2 개. 앱 안에 스케줄러가 있었다면 2 번 실행됐을 것
+  selector:
+    matchLabels: { app: ticket-api }
+  template:
+    metadata:
+      labels: { app: ticket-api }
+    spec:
+      containers:
+        - name: api
+          image: ticket-api:local
+          imagePullPolicy: Never    # 레지스트리에서 받지 말고 kind 에 load 한 로컬 이미지를 써라
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef: { name: ticket-api-config }
+            - secretRef: { name: ticket-api-secret }
+          # readiness: 준비됐나? (아니면 트래픽을 안 보냄)  liveness: 살아있나? (아니면 재시작)
+          readinessProbe:
+            httpGet: { path: /health, port: 8000 }
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /health, port: 8000 }
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          resources:
+            requests: { cpu: "50m", memory: "128Mi" }
+            limits: { cpu: "500m", memory: "256Mi" }

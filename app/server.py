@@ -6,6 +6,8 @@ from fastapi import Depends, FastAPI, Request, Response
 
 from app.api.v1.audit_router import router as audit_router
 from app.api.v1.auth_router import router as auth_router
+from app.api.v1.scheduler_endpoint import router as scheduler_router
+from app.api.v1.snapshot_router import router as snapshot_router
 from app.api.v1.ticket_router import router as ticket_router
 from app.api.v1.user_router import router as user_router
 from app.core.auth import decode_access_token, extract_token
@@ -13,6 +15,7 @@ from app.core.config import Settings, get_settings
 from app.core.db import MongoDB, close_db, connect_db, get_db
 from app.core.exceptions import AppError, UnauthorizedError, error_response, register_exception_handlers
 from app.repositories.audit_repo import AuditRepository
+from app.repositories.snapshot_repo import SnapshotRepository
 from app.repositories.ticket_repo import TicketRepository
 from app.repositories.user_repo import UserRepository
 
@@ -39,6 +42,7 @@ async def lifespan(_: FastAPI) -> AsyncGenerator[None]:
     await TicketRepository(get_db()).ensure_indexes()
     await AuditRepository(get_db()).ensure_indexes()
     await UserRepository(get_db()).ensure_indexes()
+    await SnapshotRepository(get_db()).ensure_indexes()
     yield
     # yield 후: 서버 종료 직전 실행
     await close_db()
@@ -76,6 +80,8 @@ app.include_router(auth_router)
 app.include_router(ticket_router)
 app.include_router(audit_router)
 app.include_router(user_router)
+app.include_router(snapshot_router)
+app.include_router(scheduler_router)
 
 
 @app.get("/health")
